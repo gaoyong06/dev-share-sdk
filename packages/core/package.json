@@ -1,0 +1,46 @@
+{
+  "name": "@atseeker/sdk",
+  "version": "1.0.0",
+  "description": "AtSeeker Services JavaScript SDK - 统一的公共服务 SDK",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "jest",
+    "lint": "eslint src --ext .ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "atseeker",
+    "sdk",
+    "api",
+    "passport",
+    "asset",
+    "notification",
+    "subscription",
+    "billing"
+  ],
+  "author": "AtSeeker",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.56.0",
+    "rollup": "^4.9.0",
+    "rollup-plugin-dts": "^6.1.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "tslib": "^2.6.2"
+  }
+}
+

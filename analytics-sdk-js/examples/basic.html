@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics SDK 示例</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .log {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 20px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Analytics SDK 示例</h1>
+  
+  <div>
+    <h2>事件追踪</h2>
+    <button id="signup-btn">注册按钮</button>
+    <button id="login-btn">登录按钮</button>
+    <button id="purchase-btn">购买按钮</button>
+  </div>
+
+  <div>
+    <h2>自定义事件</h2>
+    <button id="custom-event-btn">发送自定义事件</button>
+  </div>
+
+  <div>
+    <h2>用户识别</h2>
+    <button id="identify-btn">识别用户 (user-123)</button>
+    <button id="reset-btn">重置用户</button>
+  </div>
+
+  <div>
+    <h2>手动操作</h2>
+    <button id="flush-btn">立即发送事件</button>
+  </div>
+
+  <div class="log" id="log">
+    <strong>日志输出：</strong><br>
+    <div id="log-content"></div>
+  </div>
+
+  <script type="module">
+    // 注意：实际使用时需要先构建 SDK
+    // 这里假设已经通过构建工具生成了 dist/index.js
+    
+    // 模拟 SDK（实际使用时需要导入）
+    // import Analytics from '../dist/index.js'
+    
+    // 为了演示，这里使用内联代码
+    console.log('Analytics SDK 示例页面已加载')
+    
+    // 实际使用时：
+    /*
+    const analytics = new Analytics({
+      apiUrl: 'http://localhost:8109',
+      appId: 'your-app-id',
+      autoTrackPageView: true,
+      debug: true,
+    })
+
+    // 事件追踪
+    document.getElementById('signup-btn').addEventListener('click', () => {
+      analytics.track({
+        eventName: 'signup_click',
+        properties: {
+          button_name: 'signup',
+          source: 'homepage',
+        },
+      })
+      log('Signup button clicked')
+    })
+
+    document.getElementById('login-btn').addEventListener('click', () => {
+      analytics.track({
+        eventName: 'login_click',
+        properties: {
+          button_name: 'login',
+        },
+      })
+      log('Login button clicked')
+    })
+
+    document.getElementById('purchase-btn').addEventListener('click', () => {
+      analytics.track({
+        eventName: 'purchase',
+        properties: {
+          product_id: 'product-123',
+          price: 99.99,
+        },
+      })
+      log('Purchase event tracked')
+    })
+
+    // 自定义事件
+    document.getElementById('custom-event-btn').addEventListener('click', () => {
+      analytics.track({
+        eventName: 'custom_event',
+        properties: {
+          custom_prop: 'custom_value',
+        },
+      })
+      log('Custom event tracked')
+    })
+
+    // 用户识别
+    document.getElementById('identify-btn').addEventListener('click', () => {
+      analytics.identify('user-123')
+      log('User identified: user-123')
+    })
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      analytics.reset()
+      log('User reset')
+    })
+
+    // 手动刷新
+    document.getElementById('flush-btn').addEventListener('click', async () => {
+      await analytics.flush()
+      log('Events flushed')
+    })
+
+    function log(message) {
+      const logContent = document.getElementById('log-content')
+      const time = new Date().toLocaleTimeString()
+      logContent.innerHTML += `[${time}] ${message}<br>`
+      logContent.scrollTop = logContent.scrollHeight
+    }
+    */
+  </script>
+</body>
+</html>
+
