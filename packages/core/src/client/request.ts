@@ -27,14 +27,15 @@ export class RequestClient {
     try {
       const { params, appId, headers, ...restOptions } = options
 
+      // 统一解析 appId（后端 app_id 中间件只认 X-App-Id Header）
+      const resolvedAppId = appId || this.config.appId
+
       // 构建查询参数
       const searchParams = new URLSearchParams()
       
       // 添加 appId（如果提供）
-      if (appId) {
-        searchParams.append('appId', appId)
-      } else if (this.config.appId) {
-        searchParams.append('appId', this.config.appId)
+      if (resolvedAppId) {
+        searchParams.append('appId', resolvedAppId)
       }
       
       // 添加其他查询参数
@@ -70,6 +71,8 @@ export class RequestClient {
         'Content-Type': 'application/json',
         ...(token && { Authorization: `Bearer ${token}` }),
         ...(apiKey && { 'X-API-Key': apiKey }),
+        // 兼容 APISIX app-id 插件未生效的情况：直接传 X-App-Id 给上游
+        ...(resolvedAppId && { 'X-App-Id': resolvedAppId }),
         ...headers,
       }
 
@@ -308,6 +311,12 @@ export class RequestClient {
       }
       if (apiKey) {
         requestHeaders['X-API-Key'] = apiKey
+      }
+
+      // 关键：asset-service 的 app_id 中间件只从 Header 读取 X-App-Id
+      // 为了避免 APISIX app-id 插件未生效导致的 appId 丢失，这里同时设置 X-App-Id
+      if (appIdString && typeof appIdString === 'string') {
+        requestHeaders['X-App-Id'] = appIdString
       }
       
       // 添加其他自定义 headers（明确排除 Content-Type）

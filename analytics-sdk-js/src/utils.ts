@@ -42,11 +42,12 @@ export function extractUTMParams(url?: string): UTMParams {
   
   const searchParams = new URLSearchParams(url ? new URL(url).search : window.location.search)
   
-  const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']
+  // URL 参数与 SDK 内部字段统一使用小驼峰命名
+  const utmKeys: Array<keyof UTMParams> = ['utmSource', 'utmMedium', 'utmCampaign', 'utmTerm', 'utmContent']
   utmKeys.forEach((key) => {
-    const value = searchParams.get(key)
+    const value = searchParams.get(key as string)
     if (value) {
-      params[key as keyof UTMParams] = value
+      params[key] = value
     }
   })
   

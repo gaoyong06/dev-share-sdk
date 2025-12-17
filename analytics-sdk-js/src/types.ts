@@ -5,6 +5,10 @@
 export interface AnalyticsConfig {
   /** API 端点 URL */
   apiUrl: string
+  /** 是否使用前端代理（解决 CORS） */
+  useProxy?: boolean
+  /** 前端代理路径（例如：/api/proxy） */
+  apiProxy?: string
   /** 应用 ID */
   appId: string
   /** 用户 ID（可选，登录后设置） */
@@ -49,11 +53,11 @@ export interface TrackEventOptions {
 }
 
 export interface UTMParams {
-  utm_source?: string
-  utm_medium?: string
-  utm_campaign?: string
-  utm_term?: string
-  utm_content?: string
+  utmSource?: string
+  utmMedium?: string
+  utmCampaign?: string
+  utmTerm?: string
+  utmContent?: string
 }
 
 export interface BrowserInfo {
@@ -68,11 +72,11 @@ export interface BrowserInfo {
 export interface PendingEvent extends TrackEventOptions {
   id: string
   timestamp: Date
-  utm_source?: string
-  utm_medium?: string
-  utm_campaign?: string
-  utm_term?: string
-  utm_content?: string
+  utmSource?: string
+  utmMedium?: string
+  utmCampaign?: string
+  utmTerm?: string
+  utmContent?: string
   userAgent?: string
   language?: string
   screenResolution?: string

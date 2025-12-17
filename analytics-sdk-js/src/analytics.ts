@@ -30,6 +30,8 @@ export class Analytics {
     // 设置默认配置
     this.config = {
       apiUrl: config.apiUrl,
+      useProxy: config.useProxy || false,
+      apiProxy: config.apiProxy || '/api/proxy',
       appId: config.appId,
       userId: config.userId || '',
       autoTrackPageView: config.autoTrackPageView !== false,
@@ -134,11 +136,11 @@ export class Analytics {
       referrer: options.referrer || browserInfo.referrer,
       timestamp: options.timestamp || new Date(),
       // 添加 UTM 参数到 properties
-      utm_source: utmParams.utm_source,
-      utm_medium: utmParams.utm_medium,
-      utm_campaign: utmParams.utm_campaign,
-      utm_term: utmParams.utm_term,
-      utm_content: utmParams.utm_content,
+      utmSource: utmParams.utmSource,
+      utmMedium: utmParams.utmMedium,
+      utmCampaign: utmParams.utmCampaign,
+      utmTerm: utmParams.utmTerm,
+      utmContent: utmParams.utmContent,
       // 添加浏览器信息到 properties
       userAgent: browserInfo.userAgent,
       language: browserInfo.language,
@@ -218,27 +220,30 @@ export class Analytics {
       return
     }
 
-    const url = `${this.config.apiUrl}/v1/analytics/events/batch`
+    const apiPath = '/api/v1/analytics/track/batch'
+    const url = this.config.useProxy
+      ? `${this.config.apiProxy}?path=${encodeURIComponent(apiPath)}`
+      : `${this.config.apiUrl}${apiPath}`
 
     const requestBody = {
       events: events.map((event) => ({
-        app_id: this.config.appId,
-        event_name: event.eventName,
-        user_id: event.userId || '',
-        session_id: event.sessionId,
-        anonymous_id: event.anonymousId,
-        page_url: event.pageUrl,
-        page_title: event.pageTitle,
+        appId: this.config.appId,
+        eventName: event.eventName,
+        userId: event.userId || '',
+        sessionId: event.sessionId,
+        anonymousId: event.anonymousId,
+        pageUrl: event.pageUrl,
+        pageTitle: event.pageTitle,
         referrer: event.referrer,
-        utm_source: event.utm_source,
-        utm_medium: event.utm_medium,
-        utm_campaign: event.utm_campaign,
-        utm_term: event.utm_term,
-        utm_content: event.utm_content,
-        user_agent: event.userAgent,
+        utmSource: event.utmSource,
+        utmMedium: event.utmMedium,
+        utmCampaign: event.utmCampaign,
+        utmTerm: event.utmTerm,
+        utmContent: event.utmContent,
+        userAgent: event.userAgent,
         ip: '', // IP 由后端获取
         language: event.language,
-        screen_resolution: event.screenResolution,
+        screenResolution: event.screenResolution,
         properties: event.properties || {},
         timestamp: formatTimestamp(event.timestamp),
       })),
