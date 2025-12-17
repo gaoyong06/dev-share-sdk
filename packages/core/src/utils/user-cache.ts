@@ -4,7 +4,7 @@
  */
 
 import { getUserIdFromToken } from './jwt'
-import type { UserInfo } from '../types'
+import type { UserInfo } from '../types/passport'
 
 export interface UserCacheConfig {
   tokenGetter?: () => string | null

@@ -1,9 +1,10 @@
-// Asset Service API - 文件上传相关接口
+/**
+ * Asset Service - 文件上传、存储、管理
+ */
 
-import { RequestClient } from '../client/request'
+import type { RequestClient } from '../client'
 import type {
   UploadFileResponse,
-  FileInfo,
   GetFileInfoReply,
   GetFileURLReply,
   DeleteFileReply,
@@ -14,18 +15,10 @@ import type {
 const BASE_PATH = '/api/v1/files'
 
 export class AssetService {
-  private client: RequestClient
-
-  constructor(client: RequestClient) {
-    this.client = client
-  }
+  constructor(private client: RequestClient) {}
 
   /**
-   * 上传文件到 asset-service
-   * @param file 要上传的文件
-   * @param metadata 文件元数据（可选）
-   * @param appId App ID（可选）
-   * @returns 上传结果，包含 fileId
+   * 上传文件
    */
   async uploadFile(
     file: File,
@@ -33,13 +26,27 @@ export class AssetService {
     appId?: string
   ): Promise<ApiResponse<UploadFileResponse>> {
     return this.client.uploadFile<UploadFileResponse>(
-      `${BASE_PATH}/upload`,
+      BASE_PATH,
       file,
       metadata,
-      {
-        appId,
-      }
+      { appId }
     )
+  }
+
+  /**
+   * 下载文件
+   */
+  async downloadFile(
+    fileId: string
+  ): Promise<ApiResponse<Blob>> {
+    // 注意：下载文件返回的是 Blob，需要特殊处理
+    // 这里先返回 URL，实际下载由调用方处理
+    const urlResult = await this.getFileURL(fileId)
+    if (urlResult.error) {
+      return urlResult as ApiResponse<Blob>
+    }
+    // 返回 URL 字符串，调用方可以使用 fetch 下载
+    return urlResult as unknown as ApiResponse<Blob>
   }
 
   /**
@@ -50,14 +57,18 @@ export class AssetService {
   }
 
   /**
-   * 获取文件访问 URL
+   * 获取文件 URL
    */
-  async getFileURL(fileId: string, expireSeconds?: number): Promise<ApiResponse<GetFileURLReply>> {
-    return this.client.get<GetFileURLReply>(`${BASE_PATH}/${fileId}/url`, {
-      params: {
-        ...(expireSeconds && { expireSeconds }),
-      },
-    })
+  async getFileURL(
+    fileId: string,
+    expireSeconds?: number
+  ): Promise<ApiResponse<GetFileURLReply>> {
+    return this.client.get<GetFileURLReply>(
+      `${BASE_PATH}/${fileId}/url`,
+      {
+        params: expireSeconds ? { expireSeconds } : undefined,
+      }
+    )
   }
 
   /**
@@ -70,23 +81,17 @@ export class AssetService {
   /**
    * 列出文件
    */
-  async listFiles(params: {
-    page?: number
-    pageSize?: number
-    businessType?: string
-    source?: string
+  async listFiles(
+    params?: {
+      page?: number
+      pageSize?: number
+      type?: string
+    },
     appId?: string
-  }): Promise<ApiResponse<ListFilesReply>> {
-    const { page = 1, pageSize = 20, businessType, source, appId } = params
+  ): Promise<ApiResponse<ListFilesReply>> {
     return this.client.get<ListFilesReply>(BASE_PATH, {
-      params: {
-        page,
-        pageSize,
-        ...(businessType && { businessType }),
-        ...(source && { source }),
-      },
+      params,
       appId,
     })
   }
 }
-
