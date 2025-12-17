@@ -16,26 +16,43 @@ export function parseError(data: any, status: number): ApiError {
       errorCode = status
     }
 
+    const message = data.errorMessage || 
+                   data.message || 
+                   (data.error && typeof data.error === 'string' ? data.error : null) ||
+                   (typeof data === 'string' ? data : null) ||
+                   "请求失败"
+
     return {
       code: errorCode,
-      message: data.errorMessage || data.message || "请求失败",
+      message: message,
       details: data,
     }
   }
 
   // 处理标准格式：{ code: number, message: string, data: T }
   if (data.code !== undefined && data.code !== 0) {
+    const message = data.message || 
+                   (data.error && typeof data.error === 'string' ? data.error : null) ||
+                   (typeof data === 'string' ? data : null) ||
+                   "请求失败"
+
     return {
       code: data.code,
-      message: data.message || "请求失败",
+      message: message,
       details: data,
     }
   }
 
   // HTTP 错误
+  const message = data.errorMessage || 
+                 data.message || 
+                 (data.error && typeof data.error === 'string' ? data.error : null) ||
+                 (typeof data === 'string' ? data : null) ||
+                 `请求失败 (HTTP ${status})`
+
   return {
     code: status,
-    message: data.errorMessage || data.message || data.error || "请求失败",
+    message: message,
     details: data,
   }
 }

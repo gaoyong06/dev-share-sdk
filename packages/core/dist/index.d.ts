@@ -574,7 +574,7 @@ type PaymentMethod = 'alipay' | 'wechatpay' | 'stripe' | 'paypal' | 'applepay' |
 type PaymentStatus = 'pending' | 'success' | 'failed' | 'closed' | 'refunded' | 'partially_refunded';
 interface CreatePaymentRequest {
     orderId: string;
-    uid: string;
+    userId: string;
     source: string;
     amount: number;
     currency: string;
@@ -598,7 +598,7 @@ interface GetPaymentRequest {
 interface GetPaymentReply {
     paymentId: string;
     orderId: string;
-    uid: string;
+    userId: string;
     amount: number;
     currency: string;
     status: PaymentStatus;
@@ -637,7 +637,7 @@ interface TransactionRecord {
     paymentId: string;
     orderId: string;
     appId: string;
-    uid: string;
+    userId: string;
     amount: number;
     currency: string;
     status: PaymentStatus;

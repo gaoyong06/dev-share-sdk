@@ -8,7 +8,7 @@ export type PaymentStatus = 'pending' | 'success' | 'failed' | 'closed' | 'refun
 
 export interface CreatePaymentRequest {
   orderId: string
-  uid: string
+  userId: string
   source: string
   amount: number
   currency: string
@@ -35,7 +35,7 @@ export interface GetPaymentRequest {
 export interface GetPaymentReply {
   paymentId: string
   orderId: string
-  uid: string
+  userId: string
   amount: number
   currency: string
   status: PaymentStatus
@@ -79,7 +79,7 @@ export interface TransactionRecord {
   paymentId: string
   orderId: string
   appId: string
-  uid: string
+  userId: string
   amount: number
   currency: string
   status: PaymentStatus

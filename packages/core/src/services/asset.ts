@@ -13,6 +13,7 @@ import type {
 } from '../types'
 
 const BASE_PATH = '/api/v1/files'
+const UPLOAD_PATH = '/api/v1/files/upload' // 文件上传端点（multipart/form-data）
 
 export class AssetService {
   constructor(private client: RequestClient) {}
@@ -25,8 +26,9 @@ export class AssetService {
     metadata?: Record<string, string>,
     appId?: string
   ): Promise<ApiResponse<UploadFileResponse>> {
+    // 使用 /upload 端点，由 asset-service 的自定义 FileUploadHandler 处理 multipart/form-data
     return this.client.uploadFile<UploadFileResponse>(
-      BASE_PATH,
+      UPLOAD_PATH,
       file,
       metadata,
       { appId }
