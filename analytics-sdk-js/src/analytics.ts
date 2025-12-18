@@ -83,6 +83,15 @@ export class Analytics {
 
   /**
    * 获取或创建匿名 ID
+   * 遵循行业最佳实践：
+   * 1. 使用 localStorage 持久化 anonymous_id（跨会话保持）
+   * 2. 添加错误处理（localStorage 可能失败或被禁用）
+   * 3. 确保 ID 的唯一性和持久性
+   * 
+   * 重要：anonymous_id 必须在整个用户生命周期内保持一致，即使：
+   * - 页面刷新
+   * - 关闭浏览器后重新打开
+   * - 清除 cookies（但不清除 localStorage）
    */
   private getOrCreateAnonymousId(): string {
     if (typeof window === 'undefined') {
@@ -90,14 +99,35 @@ export class Analytics {
     }
 
     const storageKey = '__analytics_anonymous_id__'
-    const existingId = localStorage.getItem(storageKey)
-
-    if (existingId) {
-      return existingId
+    
+    // 尝试从 localStorage 读取已存在的 ID
+    try {
+      const existingId = localStorage.getItem(storageKey)
+      if (existingId && existingId.trim() !== '') {
+        debugLog('Found existing anonymous_id from localStorage:', existingId)
+        return existingId
+      }
+      debugLog('No existing anonymous_id in localStorage, will create new one')
+    } catch (error) {
+      // localStorage 可能被禁用或已满，记录错误但继续执行
+      debugLog('Failed to read anonymous_id from localStorage:', error)
     }
 
+    // 生成新的 ID
     const newId = generateId()
-    localStorage.setItem(storageKey, newId)
+    debugLog('Generated new anonymous_id:', newId)
+    
+    // 尝试保存到 localStorage
+    try {
+      localStorage.setItem(storageKey, newId)
+      debugLog('Saved anonymous_id to localStorage:', newId)
+    } catch (error) {
+      // localStorage 可能被禁用或已满，记录错误但继续使用生成的 ID
+      debugLog('Failed to save anonymous_id to localStorage:', error)
+      // 注意：即使保存失败，我们仍然返回生成的 ID，确保本次会话可以正常使用
+      // 但这样会导致每次刷新页面都生成新的 ID，影响用户识别准确性
+    }
+    
     return newId
   }
 

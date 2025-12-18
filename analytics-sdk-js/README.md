@@ -17,27 +17,73 @@
 ### NPM
 
 ```bash
-npm install @dev-share/analytics-sdk
+npm install @atseeker/analytics-sdk
 ```
 
 ### Yarn
 
 ```bash
-yarn add @dev-share/analytics-sdk
+yarn add @atseeker/analytics-sdk
 ```
 
 ### CDN
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@dev-share/analytics-sdk/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@atseeker/analytics-sdk/dist/index.js"></script>
 ```
 
 ## 快速开始
 
-### 基础用法
+### 🎯 推荐用法：一键初始化（Next.js / React）
+
+**只需 3 行代码即可完成接入！**
+
+```tsx
+// components/analytics-tracker.tsx
+'use client'
+import { useEffect } from 'react'
+import { initAnalytics } from '@atseeker/analytics-sdk'
+
+export function AnalyticsTracker() {
+  useEffect(() => {
+    initAnalytics({
+      appId: process.env.NEXT_PUBLIC_ANALYTICS_APP_ID || 'your-app-id',
+      useProxy: true, // 使用前端代理（解决 CORS）
+      apiProxy: '/api/proxy', // Next.js API 代理路径
+    })
+  }, [])
+  return null
+}
+
+// app/layout.tsx
+import { Suspense } from 'react'
+import { AnalyticsTracker } from '@/components/analytics-tracker'
+
+export default function Layout({ children }) {
+  return (
+    <html>
+      <body>
+        {children}
+        <Suspense fallback={null}>
+          <AnalyticsTracker />
+        </Suspense>
+      </body>
+    </html>
+  )
+}
+```
+
+**特性：**
+- ✅ 自动追踪页面浏览（首次 + 路由变化）
+- ✅ 自动处理 CORS（通过 Next.js API 代理）
+- ✅ 自动获取 userId（从 localStorage）
+- ✅ 支持从 `<meta>` 标签读取 appId
+- ✅ 零配置，开箱即用
+
+### 基础用法（手动控制）
 
 ```javascript
-import Analytics from '@dev-share/analytics-sdk'
+import Analytics from '@atseeker/analytics-sdk'
 
 // 初始化 SDK
 const analytics = new Analytics({
@@ -66,7 +112,7 @@ analytics.track({
   <title>My App</title>
 </head>
 <body>
-  <script src="https://cdn.jsdelivr.net/npm/@dev-share/analytics-sdk/dist/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@atseeker/analytics-sdk/dist/index.js"></script>
   <script>
     // 初始化 SDK
     const analytics = new Analytics.Analytics({
@@ -91,9 +137,38 @@ analytics.track({
 
 ## API 文档
 
-### 初始化
+### 一键初始化（推荐）
 
 ```typescript
+import { initAnalytics } from '@atseeker/analytics-sdk'
+
+// 最简单的用法
+initAnalytics({
+  appId: 'your-app-id',        // 应用 ID（必需）
+  useProxy?: boolean,          // 是否使用前端代理（默认：false）
+  apiProxy?: string,           // 前端代理路径（默认：'/api/proxy'）
+  apiUrl?: string,             // API 端点 URL（useProxy=false 时必需）
+  getUserId?: () => string,    // 自定义 userId 获取函数
+  autoTrackPageView?: boolean, // 是否自动追踪页面浏览（默认：true）
+  routeTracking?: 'history' | 'manual', // 路由追踪策略（默认：'history'）
+  debug?: boolean,            // 调试模式（默认：false）
+})
+
+// 获取已初始化的实例
+import { getAnalytics } from '@atseeker/analytics-sdk'
+const analytics = getAnalytics()
+```
+
+**appId 自动获取优先级：**
+1. `options.appId`（显式传入）
+2. `window.__DEV_SHARE_ANALYTICS_APP_ID__`（全局变量）
+3. `<meta name="analytics-app-id" content="xxx" />`（meta 标签）
+
+### 手动初始化
+
+```typescript
+import Analytics from '@atseeker/analytics-sdk'
+
 const analytics = new Analytics({
   apiUrl: string,              // API 端点 URL（必需）
   appId: string,               // 应用 ID（必需）
@@ -226,35 +301,108 @@ const analytics = new Analytics({
 
 ## 示例
 
-### React 应用
+### Next.js 应用（推荐）
+
+```tsx
+// components/analytics-tracker.tsx
+'use client'
+import { useEffect } from 'react'
+import { initAnalytics } from '@atseeker/analytics-sdk'
+
+export function AnalyticsTracker() {
+  useEffect(() => {
+    initAnalytics({
+      appId: process.env.NEXT_PUBLIC_ANALYTICS_APP_ID || 'your-app-id',
+      useProxy: true,
+      apiProxy: '/api/proxy',
+      debug: process.env.NODE_ENV !== 'production',
+    })
+  }, [])
+  return null
+}
+
+// app/layout.tsx
+import { Suspense } from 'react'
+import { AnalyticsTracker } from '@/components/analytics-tracker'
+
+export default function Layout({ children }) {
+  return (
+    <html>
+      <body>
+        {children}
+        <Suspense fallback={null}>
+          <AnalyticsTracker />
+        </Suspense>
+      </body>
+    </html>
+  )
+}
+
+// app/api/proxy/route.ts（解决 CORS）
+import { NextResponse } from 'next/server'
+
+export async function POST(req: Request) {
+  const { searchParams } = new URL(req.url)
+  const path = searchParams.get('path')
+  if (!path) {
+    return NextResponse.json({ error: 'Missing path' }, { status: 400 })
+  }
+  
+  const baseUrl = path.startsWith('/api/v1/analytics')
+    ? process.env.ANALYTICS_BASE_URL || 'http://localhost:8110'
+    : process.env.APISIX_GATEWAY_URL || 'http://localhost:9080'
+  
+  const targetUrl = `${baseUrl}${path}`
+  const body = await req.text()
+  
+  const response = await fetch(targetUrl, {
+    method: req.method,
+    headers: {
+      'Content-Type': 'application/json',
+      ...Object.fromEntries(req.headers.entries()),
+    },
+    body,
+  })
+  
+  return new Response(await response.text(), {
+    status: response.status,
+    headers: response.headers,
+  })
+}
+```
+
+### React 应用（手动控制）
 
 ```jsx
 import { useEffect } from 'react'
-import Analytics from '@dev-share/analytics-sdk'
+import { initAnalytics, getAnalytics } from '@atseeker/analytics-sdk'
 
 function App() {
   useEffect(() => {
-    const analytics = new Analytics({
-      apiUrl: 'https://api.yourapp.com',
+    // 方式 1：使用 initAnalytics（推荐）
+    initAnalytics({
       appId: 'your-app-id',
-      autoTrackPageView: true,
+      apiUrl: 'https://api.yourapp.com',
     })
 
-    // 用户登录后
-    analytics.identify('user-123')
-
-    return () => {
-      analytics.destroy()
-    }
+    // 方式 2：手动初始化
+    // const analytics = new Analytics({
+    //   apiUrl: 'https://api.yourapp.com',
+    //   appId: 'your-app-id',
+    //   autoTrackPageView: true,
+    // })
   }, [])
 
   const handleSignup = () => {
-    analytics.track({
-      eventName: 'signup',
-      properties: {
-        source: 'homepage',
-      },
-    })
+    const analytics = getAnalytics()
+    if (analytics) {
+      analytics.track({
+        eventName: 'signup',
+        properties: {
+          source: 'homepage',
+        },
+      })
+    }
   }
 
   return <button onClick={handleSignup}>Sign Up</button>
@@ -269,7 +417,7 @@ function App() {
 </template>
 
 <script>
-import Analytics from '@dev-share/analytics-sdk'
+import Analytics from '@atseeker/analytics-sdk'
 
 export default {
   mounted() {
