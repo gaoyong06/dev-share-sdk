@@ -14,6 +14,7 @@ export interface UploadFileResponse {
   uploadedBy: string
   createdAt: string
   metadata?: Record<string, string>
+  url: string // 文件访问URL（直接返回，方便业务方调用）
 }
 
 export interface GetFileInfoReply {
