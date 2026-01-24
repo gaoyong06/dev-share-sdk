@@ -12,8 +12,8 @@ import type {
   ApiResponse,
 } from '../types'
 
-const BASE_PATH = '/api/v1/files'
-const UPLOAD_PATH = '/api/v1/files/upload' // 文件上传端点（multipart/form-data）
+const BASE_PATH = '/asset/v1/files'
+const UPLOAD_PATH = '/asset/v1/files/upload' // 文件上传端点（multipart/form-data）
 
 export class AssetService {
   constructor(private client: RequestClient) {}

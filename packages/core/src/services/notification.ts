@@ -20,7 +20,7 @@ import type {
   ApiResponse,
 } from '../types'
 
-const BASE_PATH = '/v1/notification'
+const BASE_PATH = '/notification/v1'
 
 export class NotificationService {
   constructor(private client: RequestClient) {}

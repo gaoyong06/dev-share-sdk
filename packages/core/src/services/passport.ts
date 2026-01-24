@@ -30,7 +30,7 @@ import type {
   ApiResponse,
 } from '../types'
 
-const BASE_PATH = '/v1'
+const BASE_PATH = '/auth/v1'
 
 export class PassportService {
   constructor(
@@ -46,7 +46,7 @@ export class PassportService {
     appId?: string
   ): Promise<ApiResponse<UserResponse>> {
     return this.client.post<UserResponse>(
-      `${BASE_PATH}/auth/register`,
+      `${BASE_PATH}/register`,
       request,
       { appId: appId || this.defaultAppId }
     )
@@ -60,7 +60,7 @@ export class PassportService {
     appId?: string
   ): Promise<ApiResponse<TokenResponse>> {
     return this.client.post<TokenResponse>(
-      `${BASE_PATH}/auth/login`,
+      `${BASE_PATH}/login`,
       request,
       { appId: appId || this.defaultAppId }
     )
@@ -70,7 +70,7 @@ export class PassportService {
    * 登出
    */
   async logout(request: LogoutRequest): Promise<ApiResponse<void>> {
-    return this.client.post<void>(`${BASE_PATH}/auth/logout`, request)
+    return this.client.post<void>(`${BASE_PATH}/logout`, request)
   }
 
   /**
@@ -81,7 +81,7 @@ export class PassportService {
     appId?: string
   ): Promise<ApiResponse<void>> {
     return this.client.post<void>(
-      `${BASE_PATH}/auth/captcha`,
+      `${BASE_PATH}/captcha`,
       request,
       { appId: appId || this.defaultAppId }
     )
@@ -94,7 +94,7 @@ export class PassportService {
     request: CaptchaRequest
   ): Promise<ApiResponse<void>> {
     return this.client.post<void>(
-      `${BASE_PATH}/auth/captcha/verify`,
+      `${BASE_PATH}/captcha/verify`,
       request
     )
   }
@@ -106,7 +106,7 @@ export class PassportService {
     request: ResetPasswordRequest
   ): Promise<ApiResponse<void>> {
     return this.client.post<void>(
-      `${BASE_PATH}/auth/password/reset`,
+      `${BASE_PATH}/password/reset`,
       request
     )
   }
@@ -116,7 +116,7 @@ export class PassportService {
    */
   async validateToken(token: string): Promise<ApiResponse<UserResponse>> {
     return this.client.post<UserResponse>(
-      `${BASE_PATH}/auth/token/validate`,
+      `${BASE_PATH}/token/validate`,
       { token }
     )
   }
@@ -129,7 +129,7 @@ export class PassportService {
     appId?: string
   ): Promise<ApiResponse<GuestResponse>> {
     return this.client.post<GuestResponse>(
-      `${BASE_PATH}/auth/guest`,
+      `${BASE_PATH}/guest`,
       request,
       { appId: appId || this.defaultAppId }
     )

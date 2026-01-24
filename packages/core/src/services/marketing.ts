@@ -27,7 +27,7 @@ import type {
   ApiResponse,
 } from '../types'
 
-const BASE_PATH = '/v1'
+const BASE_PATH = '/marketing/v1'
 
 export class MarketingService {
   constructor(private client: RequestClient) {}

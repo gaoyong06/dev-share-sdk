@@ -20,7 +20,7 @@ export class RequestClient {
   async request<T>(
     url: string,
     options: RequestInit & {
-      params?: Record<string, string | number | boolean | undefined>
+      params?: Record<string, string | number | boolean | string[] | undefined>
       appId?: string
     } = {}
   ): Promise<ApiResponse<T>> {
@@ -42,7 +42,11 @@ export class RequestClient {
       if (params) {
         Object.entries(params).forEach(([key, value]) => {
           if (value !== undefined && value !== null) {
-            searchParams.append(key, String(value))
+            if (Array.isArray(value)) {
+              value.forEach(v => searchParams.append(key, String(v)))
+            } else {
+              searchParams.append(key, String(value))
+            }
           }
         })
       }
@@ -151,7 +155,7 @@ export class RequestClient {
    * GET 请求
    */
   async get<T>(url: string, options?: {
-    params?: Record<string, string | number | boolean | undefined>
+    params?: Record<string, string | number | boolean | string[] | undefined>
     appId?: string
     headers?: HeadersInit
   }): Promise<ApiResponse<T>> {
@@ -165,7 +169,7 @@ export class RequestClient {
    * POST 请求
    */
   async post<T>(url: string, body?: unknown, options?: {
-    params?: Record<string, string | number | boolean | undefined>
+    params?: Record<string, string | number | boolean | string[] | undefined>
     appId?: string
     headers?: HeadersInit
   }): Promise<ApiResponse<T>> {
@@ -180,7 +184,7 @@ export class RequestClient {
    * PUT 请求
    */
   async put<T>(url: string, body?: unknown, options?: {
-    params?: Record<string, string | number | boolean | undefined>
+    params?: Record<string, string | number | boolean | string[] | undefined>
     appId?: string
     headers?: HeadersInit
   }): Promise<ApiResponse<T>> {
@@ -195,7 +199,7 @@ export class RequestClient {
    * DELETE 请求
    */
   async delete<T>(url: string, options?: {
-    params?: Record<string, string | number | boolean | undefined>
+    params?: Record<string, string | number | boolean | string[] | undefined>
     appId?: string
     headers?: HeadersInit
   }): Promise<ApiResponse<T>> {

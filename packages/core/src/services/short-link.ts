@@ -5,7 +5,7 @@
 import type { RequestClient } from '../client'
 import type { ApiResponse } from '../types'
 
-const BASE_PATH = '/api/v1/short-link'
+const BASE_PATH = '/short-link/v1/short-link'
 
 // ==================== 类型定义 ====================
 
@@ -291,7 +291,7 @@ export class ShortLinkService {
         page: request.page,
         pageSize: request.pageSize,
         ...(request.groupId && { groupId: request.groupId }),
-        ...(request.tags && { tags: request.tags }),
+        ...(request.tags && { tags: request.tags as any }),
         ...(request.search && { search: request.search }),
       },
     })

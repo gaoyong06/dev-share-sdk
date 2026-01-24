@@ -17,7 +17,7 @@ import type {
   ApiResponse,
 } from '../types'
 
-const BASE_PATH = '/v1'
+const BASE_PATH = '/payment/v1'
 
 export class PaymentService {
   constructor(

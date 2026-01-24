@@ -37,7 +37,7 @@ import type {
   ApiResponse,
 } from '../types'
 
-const BASE_PATH = '/v1/subscription'
+const BASE_PATH = '/subscription/v1'
 
 export class SubscriptionService {
   constructor(private client: RequestClient) {}
