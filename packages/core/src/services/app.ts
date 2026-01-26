@@ -15,7 +15,7 @@ import type {
   ApiResponse,
 } from '../types'
 
-const BASE_PATH = '/api/v1/apps'
+const BASE_PATH = '/api-key/v1/apps'
 
 export class AppService {
   constructor(private client: RequestClient) {}

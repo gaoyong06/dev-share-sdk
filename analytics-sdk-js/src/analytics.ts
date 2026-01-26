@@ -250,7 +250,7 @@ export class Analytics {
       return
     }
 
-    const apiPath = '/api/v1/analytics/track/batch'
+    const apiPath = '/analytics/v1/track/batch'
     const url = this.config.useProxy
       ? `${this.config.apiProxy}?path=${encodeURIComponent(apiPath)}`
       : `${this.config.apiUrl}${apiPath}`

@@ -33,7 +33,7 @@ async function forward(req: Request) {
     return NextResponse.json({ error: 'Missing path' }, { status: 400 })
   }
 
-  const baseUrl = path.startsWith('/api/v1/analytics')
+  const baseUrl = path.startsWith('/analytics/v1')
     ? process.env.ANALYTICS_BASE_URL || 'http://localhost:8110'
     : process.env.APISIX_GATEWAY_URL || 'http://localhost:9080'
 
