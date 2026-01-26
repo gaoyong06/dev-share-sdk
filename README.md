@@ -97,7 +97,44 @@ npm run dev
    import type { UserInfo } from '@atseeker/sdk'
    ```
 
-## 📄 License
+## � 发布指南
+
+本仓库包含两个主要的 SDK 包，发布流程如下：
+
+### 1. 登录npm
+```
+npm login
+```
+
+### 1. 核心 SDK (@atseeker/sdk)
+
+位于 `packages/core` 目录，提供所有公共服务 API。
+
+```bash
+# 进入目录
+cd packages/core
+
+# 自动升级版本号并发布 (确保已登录 npm)
+npm run release
+```
+
+- npm 地址: [https://www.npmjs.com/package/@atseeker/sdk](https://www.npmjs.com/package/@atseeker/sdk)
+
+### 2. 分析 SDK (@atseeker/analytics-sdk)
+
+位于 `analytics-sdk-js` 目录，专为数据分析设计的轻量级 SDK。
+
+```bash
+# 进入目录
+cd analytics-sdk-js
+
+# 自动升级版本号并发布 (确保已登录 npm)
+npm run release
+```
+
+- npm 地址: [https://www.npmjs.com/package/@atseeker/analytics-sdk](https://www.npmjs.com/package/@atseeker/analytics-sdk)
+
+## �� License
 
 MIT
 

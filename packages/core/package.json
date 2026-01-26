@@ -1,6 +1,6 @@
 {
   "name": "@atseeker/sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AtSeeker Services JavaScript SDK - 统一的公共服务 SDK",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -13,7 +13,8 @@
     "dev": "rollup -c -w",
     "test": "jest",
     "lint": "eslint src --ext .ts",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "release": "npm version patch && npm publish --access public"
   },
   "keywords": [
     "atseeker",
@@ -43,4 +44,3 @@
     "tslib": "^2.6.2"
   }
 }
-
