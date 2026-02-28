@@ -1,6 +1,6 @@
 {
   "name": "@atseeker/sdk",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "AtSeeker Services JavaScript SDK - 统一的公共服务 SDK",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
