@@ -69,6 +69,9 @@ export interface BrowserInfo {
   referrer: string
 }
 
+/** 会话结束事件名（页面卸载时通过 sendBeacon 上报，供服务端用客户端 timestamp 计算 duration） */
+export const EVENT_SESSION_END = 'session_end'
+
 export interface PendingEvent extends TrackEventOptions {
   id: string
   timestamp: Date

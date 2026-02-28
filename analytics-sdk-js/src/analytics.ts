@@ -8,6 +8,7 @@ import type {
   EventProperties,
   PendingEvent,
 } from './types'
+import { EVENT_SESSION_END } from './types'
 import {
   generateId,
   generateSessionId,
@@ -25,6 +26,8 @@ export class Analytics {
   private lastActivityTime: number
   private eventQueue: EventQueue
   private anonymousId: string
+  /** 是否已发送 session_end（避免 pagehide/beforeunload 重复发送） */
+  private sessionEndSent = false
 
   constructor(config: AnalyticsConfig) {
     // 设置默认配置
@@ -71,11 +74,14 @@ export class Analytics {
       this.setupClickTracking()
     }
 
-    // 监听页面卸载，确保事件发送
+    // 监听页面卸载：先通过 sendBeacon 发 session_end（可靠），再 flush 队列（尽力而为）
     if (typeof window !== 'undefined') {
-      window.addEventListener('beforeunload', () => {
+      const onUnload = () => {
+        this.sendSessionEndBeacon()
         this.eventQueue.flush()
-      })
+      }
+      window.addEventListener('pagehide', onUnload)
+      window.addEventListener('beforeunload', onUnload)
     }
 
     debugLog('Analytics SDK initialized', this.config)
@@ -240,6 +246,52 @@ export class Analytics {
     this.anonymousId = this.getOrCreateAnonymousId()
     this.sessionId = generateSessionId()
     debugLog('User reset')
+  }
+
+  /**
+   * 页面卸载时通过 sendBeacon 发送会话结束事件（只带 timestamp，不带 duration）
+   * 服务端用同一 session 下事件的客户端 timestamp min/max 计算 duration 和 end_time
+   */
+  private sendSessionEndBeacon(): void {
+    if (typeof navigator === 'undefined' || !navigator.sendBeacon || this.sessionEndSent) {
+      return
+    }
+    this.sessionEndSent = true
+
+    const browserInfo = getBrowserInfo()
+    const utmParams = getStoredUTMParams()
+    const now = new Date()
+
+    const eventPayload = {
+      appId: this.config.appId,
+      eventName: EVENT_SESSION_END,
+      userId: this.config.userId || '',
+      sessionId: this.sessionId,
+      anonymousId: this.anonymousId,
+      pageUrl: browserInfo.pageUrl,
+      pageTitle: browserInfo.pageTitle,
+      referrer: browserInfo.referrer,
+      utmSource: utmParams.utmSource,
+      utmMedium: utmParams.utmMedium,
+      utmCampaign: utmParams.utmCampaign,
+      utmTerm: utmParams.utmTerm,
+      utmContent: utmParams.utmContent,
+      userAgent: browserInfo.userAgent,
+      ip: '',
+      language: browserInfo.language,
+      screenResolution: browserInfo.screenResolution,
+      properties: {} as Record<string, unknown>,
+      timestamp: formatTimestamp(now),
+    }
+
+    const apiPath = '/analytics/v1/track/batch'
+    const url = this.config.useProxy
+      ? `${this.config.apiProxy}?path=${encodeURIComponent(apiPath)}`
+      : `${this.config.apiUrl}${apiPath}`
+
+    const body = JSON.stringify({ events: [eventPayload] })
+    const sent = navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }))
+    debugLog('Session end beacon sent:', sent)
   }
 
   /**
