@@ -52,10 +52,10 @@ export class AssetService {
   }
 
   /**
-   * 获取文件信息
+   * 获取文件元信息
    */
   async getFileInfo(fileId: string): Promise<ApiResponse<GetFileInfoReply>> {
-    return this.client.get<GetFileInfoReply>(`${BASE_PATH}/${fileId}`)
+    return this.client.get<GetFileInfoReply>(`${BASE_PATH}/${fileId}/info`)
   }
 
   /**
