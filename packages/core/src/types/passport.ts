@@ -32,6 +32,8 @@ export interface UserResponse {
   phone: string
   signature: string
   title: string
+  organization: string
+  bio: string
   isoCode: string
   countryName: string
   provinceName: string
@@ -78,6 +80,8 @@ export interface UpdateProfileRequest {
   avatar?: string
   signature?: string
   title?: string
+  organization?: string
+  bio?: string
   isoCode?: string
   countryName?: string
   provinceName?: string
