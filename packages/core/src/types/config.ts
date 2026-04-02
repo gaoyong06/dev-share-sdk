@@ -17,6 +17,11 @@ export interface SDKConfig {
   retry?: number                // 重试次数
   useProxy?: boolean             // 是否使用代理
   apiProxy?: string              // 代理路径（默认：/api/proxy）
+  /**
+   * 每条请求附加的 Accept-Language（如 en-US、zh-CN），需与 passport 等服务的 i18n 中间件一致。
+   * 浏览器默认 Accept-Language 常与站点语言不一致（例如英文页仍首选系统中文），会导致 API errorMessage 语言错误。
+   */
+  getAcceptLanguage?: () => string
   
   // 内部使用配置（可选）
   internal?: {

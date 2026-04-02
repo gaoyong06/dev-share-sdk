@@ -14,6 +14,19 @@ export class RequestClient {
     this.authManager = new AuthManager(config)
   }
 
+  /** 与 passport-service i18n 约定的 Accept-Language（en-US / zh-CN） */
+  private acceptLanguageHeaders(): Record<string, string> {
+    const fn = this.config.getAcceptLanguage
+    if (typeof fn !== 'function') {
+      return {}
+    }
+    const v = fn()
+    if (v == null || String(v).trim() === '') {
+      return {}
+    }
+    return { 'Accept-Language': String(v).trim() }
+  }
+
   /**
    * 通用请求函数
    */
@@ -73,6 +86,7 @@ export class RequestClient {
       // 构建请求头
       const requestHeaders: HeadersInit = {
         'Content-Type': 'application/json',
+        ...this.acceptLanguageHeaders(),
         ...(token && { Authorization: `Bearer ${token}` }),
         ...(apiKey && { 'X-API-Key': apiKey }),
         // 兼容 APISIX app-id 插件未生效的情况：直接传 X-App-Id 给上游
@@ -322,6 +336,8 @@ export class RequestClient {
       if (appIdString && typeof appIdString === 'string') {
         requestHeaders['X-App-Id'] = appIdString
       }
+
+      Object.assign(requestHeaders, this.acceptLanguageHeaders())
       
       // 添加其他自定义 headers（明确排除 Content-Type）
       if (options?.headers) {
