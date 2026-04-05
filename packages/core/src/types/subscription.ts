@@ -26,6 +26,8 @@ export interface ListPlansReply {
 }
 
 export interface CreatePlanRequest {
+  /** 目标应用 ID（请求体与网关 Query/Header 一致） */
+  appId: string
   name: string
   description?: string
   price: number

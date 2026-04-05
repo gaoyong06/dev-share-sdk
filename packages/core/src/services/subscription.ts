@@ -45,56 +45,60 @@ export class SubscriptionService {
   /**
    * 获取套餐列表
    */
-  async listPlans(appId?: string): Promise<ApiResponse<ListPlansReply>> {
+  async listPlans(appId: string): Promise<ApiResponse<ListPlansReply>> {
     return this.client.get<ListPlansReply>(`${BASE_PATH}/plans`, {
       appId,
     })
   }
 
   /**
-   * 创建套餐
+   * 创建套餐（请求体须含 appId）
    */
   async createPlan(
-    request: CreatePlanRequest,
-    appId?: string
+    request: CreatePlanRequest
   ): Promise<ApiResponse<CreatePlanReply>> {
-    return this.client.post<CreatePlanReply>(
-      `${BASE_PATH}/plans`,
-      request,
-      { appId }
-    )
+    return this.client.post<CreatePlanReply>(`${BASE_PATH}/plans`, request, {
+      appId: request.appId,
+    })
   }
 
   /**
    * 更新套餐
    */
   async updatePlan(
-    request: UpdatePlanRequest
+    request: UpdatePlanRequest,
+    appId: string
   ): Promise<ApiResponse<UpdatePlanReply>> {
     const { planId, ...data } = request
     return this.client.put<UpdatePlanReply>(
       `${BASE_PATH}/plans/${planId}`,
-      data
+      data,
+      { appId }
     )
   }
 
   /**
    * 删除套餐
    */
-  async deletePlan(planId: string): Promise<ApiResponse<DeletePlanReply>> {
-    return this.client.delete<DeletePlanReply>(
-      `${BASE_PATH}/plans/${planId}`
-    )
+  async deletePlan(
+    planId: string,
+    appId: string
+  ): Promise<ApiResponse<DeletePlanReply>> {
+    return this.client.delete<DeletePlanReply>(`${BASE_PATH}/plans/${planId}`, {
+      appId,
+    })
   }
 
   /**
    * 获取套餐区域定价列表
    */
   async listPlanPricings(
-    planId: string
+    planId: string,
+    appId: string
   ): Promise<ApiResponse<ListPlanPricingsReply>> {
     return this.client.get<ListPlanPricingsReply>(
-      `${BASE_PATH}/plans/${planId}/pricings`
+      `${BASE_PATH}/plans/${planId}/pricings`,
+      { appId }
     )
   }
 
@@ -102,12 +106,14 @@ export class SubscriptionService {
    * 创建区域定价
    */
   async createPlanPricing(
-    request: CreatePlanPricingRequest
+    request: CreatePlanPricingRequest,
+    appId: string
   ): Promise<ApiResponse<CreatePlanPricingReply>> {
     const { planId, ...data } = request
     return this.client.post<CreatePlanPricingReply>(
       `${BASE_PATH}/plans/${planId}/pricings`,
-      data
+      data,
+      { appId }
     )
   }
 
@@ -115,12 +121,14 @@ export class SubscriptionService {
    * 更新区域定价
    */
   async updatePlanPricing(
-    request: UpdatePlanPricingRequest
+    request: UpdatePlanPricingRequest,
+    appId: string
   ): Promise<ApiResponse<UpdatePlanPricingReply>> {
     const { planPricingId, ...data } = request
     return this.client.put<UpdatePlanPricingReply>(
       `${BASE_PATH}/pricings/${planPricingId}`,
-      data
+      data,
+      { appId }
     )
   }
 
@@ -128,10 +136,12 @@ export class SubscriptionService {
    * 删除区域定价
    */
   async deletePlanPricing(
-    planPricingId: number
+    planPricingId: number,
+    appId: string
   ): Promise<ApiResponse<DeletePlanPricingReply>> {
     return this.client.delete<DeletePlanPricingReply>(
-      `${BASE_PATH}/pricings/${planPricingId}`
+      `${BASE_PATH}/pricings/${planPricingId}`,
+      { appId }
     )
   }
 
