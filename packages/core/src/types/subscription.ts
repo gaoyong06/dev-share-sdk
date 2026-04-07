@@ -1,18 +1,29 @@
 /**
  * Subscription Service 类型定义
+ * 与 subscription-service/api/subscription/v1/subscription.proto 中 JSON（camelCase）字段一致；无 durationDays。
  */
 
+/** 套餐计费周期，对应 proto Plan.period_type */
+export type PlanPeriodType = 'DAY' | 'MONTH' | 'YEAR' | 'FOREVER'
+
+/** 对应 proto message Plan */
 export interface Plan {
   planId: string
   name: string
   description: string
   price: number
   currency: string
-  durationDays: number
+  /** 产品线档位：free / pro / enterprise */
   type: string
   appId: string
+  /** DAY/MONTH/YEAR/FOREVER */
+  periodType: PlanPeriodType | string
+  intervalCount: number
+  features: string[]
+  pricings: PlanPricing[]
 }
 
+/** 对应 proto message PlanPricing（planPricingId 为 uint64，JSON 多为 number） */
 export interface PlanPricing {
   planPricingId: number
   planId: string
@@ -32,7 +43,10 @@ export interface CreatePlanRequest {
   description?: string
   price: number
   currency: string
-  durationDays: number
+  periodType: PlanPeriodType | string
+  intervalCount: number
+  /** 权益 i18n key */
+  features?: string[]
   type: string
 }
 
@@ -46,7 +60,9 @@ export interface UpdatePlanRequest {
   description?: string
   price?: number
   currency?: string
-  durationDays?: number
+  periodType?: PlanPeriodType | string
+  intervalCount?: number
+  features?: string[]
   type?: string
 }
 
@@ -143,6 +159,7 @@ export interface GetSubscriptionOrderReply {
   order: SubscriptionOrderInfo
 }
 
+/** 对应 proto message AppSubscriptionInfo（subscriptionId 为 uint64） */
 export interface AppSubscriptionInfo {
   subscriptionId: number
   userId: string
@@ -173,6 +190,7 @@ export interface ListAppSubscriptionsReply {
   pageSize: number
 }
 
+/** 对应 proto message SubscriptionHistoryItem（id 为 uint64） */
 export interface SubscriptionHistoryItem {
   id: number
   userId: string
@@ -183,6 +201,17 @@ export interface SubscriptionHistoryItem {
   status: string
   action: string
   createdAt: number
+}
+
+/** 对应 proto message SubscriptionInfo */
+export interface SubscriptionInfo {
+  userId: string
+  planId: string
+  planName: string
+  startTime: number
+  endTime: number
+  autoRenew: boolean
+  amount: number
 }
 
 export interface GetAppSubscriptionHistoryRequest {
