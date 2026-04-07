@@ -231,17 +231,41 @@ export interface GetAppSubscriptionHistoryReply {
   pageSize: number
 }
 
-export interface GetMySubscriptionRequest {
+/** 与 proto GetOrEnsureMySubscription 一致：GET 时若无订阅行会惰性创建默认免费档 */
+export interface GetOrEnsureMySubscriptionRequest {
   userId: string
 }
 
-export interface GetMySubscriptionReply {
+export interface GetOrEnsureMySubscriptionReply {
   isActive: boolean
   planId: string
   startTime: number
   endTime: number
   status: string
   autoRenew: boolean
+  /** 套餐展示名，常为 i18n key */
+  planName?: string
+  /** free | pro | enterprise */
+  planType?: string
+  /** MONTH | YEAR | FOREVER | DAY */
+  periodType?: string
+  /** 本次调用是否新写入了默认免费档 */
+  defaultFreeMaterialized?: boolean
+}
+
+/** @deprecated 使用 GetOrEnsureMySubscriptionRequest */
+export type GetMySubscriptionRequest = GetOrEnsureMySubscriptionRequest
+/** @deprecated 使用 GetOrEnsureMySubscriptionReply */
+export type GetMySubscriptionReply = GetOrEnsureMySubscriptionReply
+
+/** 幂等开通默认免费档（须携带登录态或内部网关代填） */
+export interface EnsureDefaultFreeSubscriptionRequest {
+  userId: string
+}
+
+export interface EnsureDefaultFreeSubscriptionReply {
+  created: boolean
+  alreadySubscribed: boolean
 }
 
 export interface CancelSubscriptionRequest {

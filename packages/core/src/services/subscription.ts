@@ -26,8 +26,10 @@ import type {
   ListAppSubscriptionsReply,
   GetAppSubscriptionHistoryRequest,
   GetAppSubscriptionHistoryReply,
-  GetMySubscriptionRequest,
-  GetMySubscriptionReply,
+  GetOrEnsureMySubscriptionRequest,
+  GetOrEnsureMySubscriptionReply,
+  EnsureDefaultFreeSubscriptionRequest,
+  EnsureDefaultFreeSubscriptionReply,
   CancelSubscriptionRequest,
   PauseSubscriptionRequest,
   ResumeSubscriptionRequest,
@@ -159,14 +161,26 @@ export class SubscriptionService {
   }
 
   /**
-   * 获取我的订阅
+   * 获取（并必要时初始化）我的订阅 —— 推荐唯一入口；首次可能写入默认免费档
    */
-  async getMySubscription(
-    request: GetMySubscriptionRequest
-  ): Promise<ApiResponse<GetMySubscriptionReply>> {
+  async getOrEnsureMySubscription(
+    request: GetOrEnsureMySubscriptionRequest
+  ): Promise<ApiResponse<GetOrEnsureMySubscriptionReply>> {
     const { userId } = request
-    return this.client.get<GetMySubscriptionReply>(
+    return this.client.get<GetOrEnsureMySubscriptionReply>(
       `${BASE_PATH}/my/${userId}`
+    )
+  }
+
+  /**
+   * 幂等写入默认免费档订阅（服务端无记录时创建）
+   */
+  async ensureDefaultFreeSubscription(
+    request: EnsureDefaultFreeSubscriptionRequest
+  ): Promise<ApiResponse<EnsureDefaultFreeSubscriptionReply>> {
+    return this.client.post<EnsureDefaultFreeSubscriptionReply>(
+      `${BASE_PATH}/my/ensure-free`,
+      request
     )
   }
 
