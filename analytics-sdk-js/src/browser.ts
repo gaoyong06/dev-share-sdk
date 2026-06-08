@@ -145,6 +145,7 @@ export function initAnalytics(options: InitAnalyticsOptions): Analytics | null {
     useProxy,
     apiProxy,
     appId,
+    apiKey: options.apiKey,
     userId: getUserId(),
     autoTrackPageView: false, // 统一在这里控制，避免 SDK 内部重复
     autoTrackClick: options.autoTrackClick,
@@ -152,6 +153,12 @@ export function initAnalytics(options: InitAnalyticsOptions): Analytics | null {
     batchSize: options.batchSize,
     sessionTimeout: options.sessionTimeout,
     debug: options.debug,
+    // 任务 2 新增：重试 / 持久化 / 退避相关参数透传
+    maxRetries: options.maxRetries,
+    initialBackoffMs: options.initialBackoffMs,
+    maxBackoffMs: options.maxBackoffMs,
+    maxEventAgeMs: options.maxEventAgeMs,
+    persistEnabled: options.persistEnabled,
   })
 
   window.__DEV_SHARE_ANALYTICS__ = analytics

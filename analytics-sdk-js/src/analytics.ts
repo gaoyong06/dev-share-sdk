@@ -36,6 +36,7 @@ export class Analytics {
       useProxy: config.useProxy || false,
       apiProxy: config.apiProxy || '/api/proxy',
       appId: config.appId,
+      apiKey: config.apiKey || '',
       userId: config.userId || '',
       autoTrackPageView: config.autoTrackPageView !== false,
       autoTrackClick: config.autoTrackClick || false,
@@ -43,6 +44,11 @@ export class Analytics {
       batchSize: config.batchSize || 10,
       sessionTimeout: config.sessionTimeout || 30 * 60 * 1000, // 30分钟
       debug: config.debug || false,
+      maxRetries: config.maxRetries ?? 5,
+      initialBackoffMs: config.initialBackoffMs ?? 1000,
+      maxBackoffMs: config.maxBackoffMs ?? 60_000,
+      maxEventAgeMs: config.maxEventAgeMs ?? 24 * 60 * 60 * 1000,
+      persistEnabled: config.persistEnabled ?? true,
     }
 
     // 启用调试模式
@@ -57,10 +63,17 @@ export class Analytics {
     // 初始化匿名 ID
     this.anonymousId = this.getOrCreateAnonymousId()
 
-    // 初始化事件队列
+    // 初始化事件队列（带指数退避 + localStorage 持久化）
     this.eventQueue = new EventQueue(
-      this.config.batchSize,
-      this.config.batchInterval,
+      {
+        batchSize: this.config.batchSize,
+        batchInterval: this.config.batchInterval,
+        maxRetries: this.config.maxRetries,
+        initialBackoffMs: this.config.initialBackoffMs,
+        maxBackoffMs: this.config.maxBackoffMs,
+        maxEventAgeMs: this.config.maxEventAgeMs,
+        persistEnabled: this.config.persistEnabled,
+      },
       (events) => this.sendBatchEvents(events)
     )
 
@@ -161,7 +174,7 @@ export class Analytics {
     const browserInfo = getBrowserInfo()
     const utmParams = getStoredUTMParams()
 
-    const event: Omit<PendingEvent, 'id' | 'timestamp'> = {
+    const event: Omit<PendingEvent, 'id'> = {
       eventName: options.eventName,
       properties: options.properties || {},
       userId: options.userId || this.config.userId,
@@ -331,17 +344,30 @@ export class Analytics {
       })),
     }
 
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    }
+    // 直连模式下，如果配置了 apiKey，注入到请求头
+    // 走 BFF 代理模式（useProxy=true）时，由 BFF 服务端注入 API Key，前端不携带
+    if (!this.config.useProxy && this.config.apiKey) {
+      headers['X-API-Key'] = this.config.apiKey
+    }
+
     try {
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify(requestBody),
       })
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        // 4xx 客户端错误（除 408/429）通常重试也没用，标记为不可重试错误
+        // 上层 EventQueue 仍会按重试策略处理；这里只是给一个清晰的语义标识
+        const isClientError = response.status >= 400 && response.status < 500 &&
+          response.status !== 408 && response.status !== 429
+        const errMsg = `HTTP ${response.status}${isClientError ? ' (non-retryable client error)' : ''}`
+        debugLog('Failed to send batch events:', errMsg)
+        throw new Error(errMsg)
       }
 
       const result = await response.json()

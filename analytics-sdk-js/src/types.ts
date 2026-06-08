@@ -11,6 +11,8 @@ export interface AnalyticsConfig {
   apiProxy?: string
   /** 应用 ID */
   appId: string
+  /** API Key（可选，浏览器侧通常通过 BFF 注入；直连场景需提供） */
+  apiKey?: string
   /** 用户 ID（可选，登录后设置） */
   userId?: string
   /** 是否自动追踪页面浏览 */
@@ -25,6 +27,18 @@ export interface AnalyticsConfig {
   sessionTimeout?: number
   /** 调试模式 */
   debug?: boolean
+
+  // ---- 重试 / 持久化 / 退避（详见 EventQueue 实现） ----
+  /** 单条事件最大重试次数。默认 5 */
+  maxRetries?: number
+  /** 指数退避初始延迟（毫秒）。默认 1000 */
+  initialBackoffMs?: number
+  /** 指数退避延迟上限（毫秒）。默认 60000 */
+  maxBackoffMs?: number
+  /** 队列内事件最大存活时间（毫秒），超出丢入 DLQ。默认 86400000（24h） */
+  maxEventAgeMs?: number
+  /** 是否启用 localStorage 持久化。默认 true */
+  persistEnabled?: boolean
 }
 
 export interface EventProperties {
